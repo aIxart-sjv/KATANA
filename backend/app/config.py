@@ -1,3 +1,4 @@
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -9,6 +10,14 @@ class Settings(BaseSettings):
     PORT: int = 8000
 
     FRONTEND_ORIGIN: str = "http://localhost:5173"
+
+    WATCH_DIRECTORIES: list[str] = Field(
+        default=[
+            "/tmp",
+            "/etc",
+            "/tmp/katana_demo",
+        ]
+    )
 
     class Config:
         env_file = ".env"

@@ -5,7 +5,7 @@ from app.ml.features_to_vector import to_vector
 
 
 class BaselineManager:
-    def __init__(self, baseline_size: int = 300):
+    def __init__(self, baseline_size: int = 12):
         self.baseline_size = baseline_size
         self.samples: deque[list[float]] = deque(maxlen=baseline_size)
 

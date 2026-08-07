@@ -6,6 +6,7 @@ fastapi==0.141.1
 h11==0.16.0
 httptools==0.8.0
 idna==3.18
+inotify-simple==2.0.1
 joblib==1.5.3
 loguru==0.7.3
 narwhals==2.24.0
