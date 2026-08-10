@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 
 from app.api.health import router as health_router
-from app.collectors.ebpf.collector import EBPFCollector
 from app.collectors.filesystem import FilesystemCollector
 from app.collectors.process import ProcessCollector
 from app.config import settings
@@ -14,8 +13,7 @@ from app.event_bus import event_bus
 from app.pipeline.orchestrator import PipelineOrchestrator
 from app.services.broadcaster import broadcast_event
 from app.websocket.routes import router as websocket_router
-
-
+from app.kernel.loader.loader import KernelLoader
 # ------------------------------------------------------------------
 # Temporary Debug Subscriber
 # ------------------------------------------------------------------
@@ -30,7 +28,7 @@ async def debug(event):
 
 process_collector = ProcessCollector()
 filesystem_collector = FilesystemCollector()
-ebpf_collector = EBPFCollector()
+kernel_loader = KernelLoader()
 orchestrator = PipelineOrchestrator()
 
 
@@ -54,8 +52,8 @@ async def lifespan(app: FastAPI):
         filesystem_collector.start()
     )
 
-    ebpf_task = asyncio.create_task(
-        ebpf_collector.start()
+    kernel_task = asyncio.create_task(
+        kernel_loader.start()
     )
 
     orchestrator_task = asyncio.create_task(
@@ -67,12 +65,12 @@ async def lifespan(app: FastAPI):
     # Graceful Shutdown
     await process_collector.stop()
     await filesystem_collector.stop()
-    await ebpf_collector.stop()
+    await kernel_loader.stop()
     await orchestrator.stop()
 
     process_task.cancel()
     filesystem_task.cancel()
-    ebpf_task.cancel()
+    kernel_task.cancel()
     orchestrator_task.cancel()
 
 

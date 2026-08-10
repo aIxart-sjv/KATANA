@@ -29,6 +29,8 @@ class EventType(str, Enum):
     CONNECTION_OPENED = "connection_opened"
     CONNECTION_CLOSED = "connection_closed"
     EXTERNAL_CONNECTION = "external_connection"
+    NETWORK_CONNECT = "network_connect"
+    NETWORK_ACCEPT = "network_accept"
 
     # Filesystem Events
     FILE_CREATED = "file_created"

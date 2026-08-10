@@ -39,3 +39,9 @@ class Event(BaseModel):
     memory_percent: float | None = None
 
     metadata: dict[str, Any] = Field(default_factory=dict)
+
+    remote_ip: str | None = None
+    remote_port: int | None = None
+
+    local_ip: str | None = None
+    local_port: int | None = None
