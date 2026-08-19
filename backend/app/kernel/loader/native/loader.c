@@ -16,6 +16,7 @@
 #include "../../skeletons/open.skel.h"
 #include "../../skeletons/unlink.skel.h"
 #include "../../skeletons/setuid.skel.h"
+#include "../../skeletons/ptrace.skel.h"
 
 #include "../../headers/katana.h"
 
@@ -122,6 +123,7 @@ int main(void)
     struct open_bpf *open_skel = NULL;
     struct unlink_bpf *unlink_skel = NULL;
     struct setuid_bpf *setuid_skel = NULL;
+    struct ptrace_bpf *ptrace_skel = NULL;
 
     struct ring_buffer *rb = NULL;
 
@@ -383,6 +385,50 @@ int main(void)
 
 
     /* =====================================================
+    * PTRACE
+    * ===================================================== */
+
+    ptrace_skel = ptrace_bpf__open();
+
+    if (!ptrace_skel) {
+
+        fprintf(
+            stderr,
+            "Failed to open PTRACE BPF skeleton\n"
+        );
+
+        err = 1;
+        goto cleanup;
+    }
+
+    err = ptrace_bpf__load(ptrace_skel);
+
+    if (err) {
+
+        fprintf(
+            stderr,
+            "Failed to load PTRACE BPF skeleton: %d\n",
+            err
+        );
+
+        goto cleanup;
+    }
+
+    err = ptrace_bpf__attach(ptrace_skel);
+
+    if (err) {
+
+        fprintf(
+            stderr,
+            "Failed to attach PTRACE BPF skeleton: %d\n",
+            err
+        );
+
+        goto cleanup;
+    }
+
+
+    /* =====================================================
      * Create unified ring buffer
      * ===================================================== */
 
@@ -496,6 +542,28 @@ int main(void)
         goto cleanup;
     }
 
+    /* =====================================================
+    * Add PTRACE ring buffer
+    * ===================================================== */
+
+    err = ring_buffer__add(
+        rb,
+        bpf_map__fd(ptrace_skel->maps.events),
+        handle_event,
+        NULL
+    );
+
+    if (err) {
+
+        fprintf(
+            stderr,
+            "Failed to add PTRACE ring buffer: %d\n",
+            err
+        );
+
+        goto cleanup;
+    }
+
 
     /* =====================================================
      * Loader ready
@@ -523,6 +591,10 @@ int main(void)
 
     printf(
         "  [OK] setuid tracepoint attached\n"
+    );
+
+    printf(
+        "  [OK] ptrace tracepoint attached\n"
     );
 
     fflush(stdout);
@@ -571,6 +643,15 @@ cleanup:
      * ===================================================== */
 
     ring_buffer__free(rb);
+
+
+    /* =====================================================
+    * Cleanup PTRACE
+    * ===================================================== */
+
+    if (ptrace_skel) {
+        ptrace_bpf__destroy(ptrace_skel);
+    }
 
 
     /* =====================================================

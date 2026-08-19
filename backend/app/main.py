@@ -10,21 +10,31 @@ from app.collectors.filesystem import FilesystemCollector
 from app.collectors.process import ProcessCollector
 from app.config import settings
 from app.event_bus import event_bus
-from app.pipeline.orchestrator import PipelineOrchestrator
-from app.services.broadcaster import broadcast_event
-from app.websocket.routes import router as websocket_router
 from app.kernel.loader.loader import KernelLoader
+from app.pipeline.orchestrator import PipelineOrchestrator
+from app.websocket.routes import router as websocket_router
+from app.api.events import router as events_router
+
 # ------------------------------------------------------------------
-# Temporary Debug Subscriber
+# Debug Subscriber
 # ------------------------------------------------------------------
 
+
 async def debug(event):
-    logger.info(event.model_dump())
+
+    logger.info(
+        f"KATANA EVENT | "
+        f"type={event.event_type.value} | "
+        f"source={event.source.value} | "
+        f"pid={event.pid} | "
+        f"process={event.process_name}"
+    )
 
 
 # ------------------------------------------------------------------
 # Global Components
 # ------------------------------------------------------------------
+
 
 process_collector = ProcessCollector()
 filesystem_collector = FilesystemCollector()
@@ -36,14 +46,20 @@ orchestrator = PipelineOrchestrator()
 # Application Lifespan
 # ------------------------------------------------------------------
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
 
+    # --------------------------------------------------------------
     # Event Subscribers
-    event_bus.subscribe(broadcast_event)
+    # --------------------------------------------------------------
+
     event_bus.subscribe(debug)
 
+    # --------------------------------------------------------------
     # Background Tasks
+    # --------------------------------------------------------------
+
     process_task = asyncio.create_task(
         process_collector.start()
     )
@@ -60,23 +76,59 @@ async def lifespan(app: FastAPI):
         orchestrator.run()
     )
 
-    yield
+    logger.info(
+        "KATANA background services started"
+    )
 
-    # Graceful Shutdown
-    await process_collector.stop()
-    await filesystem_collector.stop()
-    await kernel_loader.stop()
-    await orchestrator.stop()
+    try:
 
-    process_task.cancel()
-    filesystem_task.cancel()
-    kernel_task.cancel()
-    orchestrator_task.cancel()
+        yield
+
+    finally:
+
+        # ----------------------------------------------------------
+        # Stop Services
+        # ----------------------------------------------------------
+
+        logger.info(
+            "Stopping KATANA background services..."
+        )
+
+        await process_collector.stop()
+        await filesystem_collector.stop()
+        await kernel_loader.stop()
+        await orchestrator.stop()
+
+        # ----------------------------------------------------------
+        # Cancel Remaining Tasks
+        # ----------------------------------------------------------
+
+        tasks = [
+            process_task,
+            filesystem_task,
+            kernel_task,
+            orchestrator_task,
+        ]
+
+        for task in tasks:
+
+            if not task.done():
+                task.cancel()
+
+        await asyncio.gather(
+            *tasks,
+            return_exceptions=True,
+        )
+
+        logger.info(
+            "KATANA background services stopped"
+        )
 
 
 # ------------------------------------------------------------------
-# FastAPI App
+# FastAPI Application
 # ------------------------------------------------------------------
+
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -86,12 +138,15 @@ app = FastAPI(
 
 
 # ------------------------------------------------------------------
-# Middleware
+# CORS Middleware
 # ------------------------------------------------------------------
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_ORIGIN],
+    allow_origins=[
+        settings.FRONTEND_ORIGIN,
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -102,5 +157,15 @@ app.add_middleware(
 # Routes
 # ------------------------------------------------------------------
 
-app.include_router(health_router)
-app.include_router(websocket_router)
+
+app.include_router(
+    health_router
+)
+
+app.include_router(
+    events_router
+)
+
+app.include_router(
+    websocket_router
+)

@@ -1,12 +1,15 @@
 import asyncio
+import inspect
 from collections.abc import Awaitable, Callable
 
 from app.schemas.event import Event
 
-Subscriber = Callable[[Event], Awaitable[None]]
+
+Subscriber = Callable[[Event], Awaitable[None] | None]
 
 
 class EventBus:
+
     def __init__(self):
         self._subscribers: list[Subscriber] = []
 
@@ -14,10 +17,22 @@ class EventBus:
         self._subscribers.append(subscriber)
 
     async def publish(self, event: Event):
+
         if not self._subscribers:
             return
 
-        await asyncio.gather(
-            *(subscriber(event) for subscriber in self._subscribers),
-            return_exceptions=True,
-        )
+        tasks = []
+
+        for subscriber in self._subscribers:
+
+            result = subscriber(event)
+
+            if inspect.isawaitable(result):
+                tasks.append(result)
+
+        if tasks:
+
+            await asyncio.gather(
+                *tasks,
+                return_exceptions=True,
+            )
