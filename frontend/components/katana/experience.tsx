@@ -153,7 +153,7 @@ export function Experience() {
           {phase === 'ready' && (
             <div className="flex flex-col items-center gap-8 text-center">
               <p className="font-serif text-2xl tracking-[0.4em] text-muted-foreground">
-                侍
+                刀
               </p>
               <button
                 type="button"

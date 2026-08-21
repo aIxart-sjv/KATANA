@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
-    FRONTEND_ORIGIN: str = "http://localhost:5173"
+    FRONTEND_ORIGIN: str = "http://localhost:3000"
 
     WATCH_DIRECTORIES: list[str] = Field(
         default=[

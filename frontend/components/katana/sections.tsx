@@ -1,28 +1,29 @@
 'use client'
+import { KatanaDashboard } from '@/components/dashboard/katana-dashboard'
 
 const sections = [
   {
-    kicker: 'Chapter I — Tamahagane',
-    title: 'Born of Fire and Sand',
-    body: 'Three days and three nights the smith feeds the tatara furnace, coaxing raw iron sand into tamahagane — the jewel steel that will become a blade.',
+    kicker: 'SYSTEM LAYER 01',
+    title: 'EVERY SIGNAL MATTERS.',
+    body: 'KATANA observes the operating system at its core. Process activity, system behavior, kernel-level events, and evolving runtime patterns are continuously collected to understand what normal actually looks like.',
     align: 'left' as const,
   },
   {
-    kicker: 'Chapter II — The Fold',
-    title: 'A Thousand Layers',
-    body: 'Folded and hammered again and again, the steel is purified until it holds sixteen thousand layers — strength in the spine, patience in every seam.',
+    kicker: 'SYSTEM LAYER 02',
+    title: 'NORMAL IS LEARNED. NOT ASSUMED.',
+    body: 'Instead of relying only on static signatures, KATANA builds a behavioral understanding of the system. It establishes a baseline and continuously compares new activity against expected patterns.',
     align: 'right' as const,
   },
   {
-    kicker: 'Chapter III — The Hamon',
-    title: 'Where the Edge Awakens',
-    body: 'Clay-tempered and quenched, the blade curves in the water. Along its edge blooms the hamon — a frozen wave marking the line between soft and unbreakable.',
+    kicker: 'SYSTEM LAYER 03',
+    title: 'THE ANOMALY REVEALS ITSELF.',
+    body: 'When behavior begins to deviate, KATANA identifies the change. Unusual execution patterns, suspicious system activity, and abnormal behavioral relationships are treated as signals for investigation.',
     align: 'left' as const,
   },
   {
-    kicker: 'Chapter IV — Balance',
-    title: 'The Weight of Stillness',
-    body: 'Guard, collar, and wrap are fitted by hand until the katana rests weightless in the palm — an instrument of restraint far more than force.',
+    kicker: 'SYSTEM LAYER 04',
+    title: 'ANALYSIS WITHOUT A BLACK BOX.',
+    body: 'Detection alone is not intelligence. KATANA is designed to explain why activity was flagged, helping the investigator understand the behavioral factors behind an anomaly instead of receiving an unexplained alert.',
     align: 'right' as const,
   },
 ]
@@ -30,83 +31,297 @@ const sections = [
 export function Sections() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative flex h-screen flex-col items-center justify-center px-6 text-center">
+      {/* ========================================================
+          HERO
+          ======================================================== */}
+
+      <section
+        className="
+          relative
+          flex
+          h-screen
+          flex-col
+          items-center
+          justify-center
+          px-6
+          text-center
+        "
+      >
         <p
           data-reveal
-          className="mb-6 font-sans text-xs uppercase tracking-[0.5em] text-primary"
+          className="
+            mb-6
+            font-sans
+            text-[10px]
+            uppercase
+            tracking-[0.55em]
+            text-primary
+            sm:text-xs
+          "
         >
-          The Soul of the Blade
+          Kernel Anomaly Tracking
         </p>
+
         <h1
           data-reveal
-          className="font-serif text-6xl font-semibold tracking-[0.15em] text-foreground text-balance sm:text-7xl md:text-8xl"
+          className="
+            font-serif
+            text-6xl
+            font-semibold
+            tracking-[0.18em]
+            text-foreground
+            text-balance
+            sm:text-7xl
+            md:text-8xl
+          "
         >
-          TAMASHII
+          KATANA
         </h1>
-        <p
-          data-reveal
-          className="mt-8 max-w-md font-sans text-sm leading-relaxed text-muted-foreground text-pretty"
-        >
-          A single blade, forged over months, revealed one motion at a time.
-        </p>
+
         <div
           data-reveal
-          className="absolute bottom-10 flex flex-col items-center gap-2 text-muted-foreground"
+          className="
+            mt-8
+            h-px
+            w-24
+            bg-gradient-to-r
+            from-transparent
+            via-primary
+            to-transparent
+          "
+        />
+
+        <p
+          data-reveal
+          className="
+            mt-8
+            max-w-xl
+            font-sans
+            text-sm
+            leading-relaxed
+            text-muted-foreground
+            text-pretty
+          "
         >
-          <span className="font-sans text-[0.65rem] uppercase tracking-[0.3em]">
-            Scroll
+          An intelligent Linux security system built to observe behavior,
+          detect anomalies, analyze threats, and explain what matters.
+        </p>
+
+        <div
+          data-reveal
+          className="
+            absolute
+            bottom-10
+            flex
+            flex-col
+            items-center
+            gap-2
+            text-muted-foreground
+          "
+        >
+          <span
+            className="
+              font-sans
+              text-[0.65rem]
+              uppercase
+              tracking-[0.3em]
+            "
+          >
+            Begin Analysis
           </span>
-          <span className="h-10 w-px animate-pulse bg-gradient-to-b from-primary to-transparent" />
+
+          <span
+            className="
+              h-10
+              w-px
+              animate-pulse
+              bg-gradient-to-b
+              from-primary
+              to-transparent
+            "
+          />
         </div>
       </section>
 
-      {sections.map((s) => (
+      {/* ========================================================
+          KATANA STORY SECTIONS
+          ======================================================== */}
+
+      {sections.map((section) => (
         <section
-          key={s.title}
-          className={`relative flex h-screen items-center px-6 sm:px-12 md:px-20 ${
-            s.align === 'right' ? 'justify-end' : 'justify-start'
-          }`}
+          key={section.title}
+          className={`
+            relative
+            flex
+            h-screen
+            items-center
+            px-6
+            sm:px-12
+            md:px-20
+            ${
+              section.align === 'right'
+                ? 'justify-end'
+                : 'justify-start'
+            }
+          `}
         >
           <div
             data-reveal
-            className={`max-w-md ${s.align === 'right' ? 'text-right' : 'text-left'}`}
+            className={`
+              max-w-md
+              ${
+                section.align === 'right'
+                  ? 'text-right'
+                  : 'text-left'
+              }
+            `}
           >
-            <p className="mb-4 font-sans text-xs uppercase tracking-[0.4em] text-primary">
-              {s.kicker}
+            <p
+              className="
+                mb-4
+                font-sans
+                text-[10px]
+                uppercase
+                tracking-[0.45em]
+                text-primary
+                sm:text-xs
+              "
+            >
+              {section.kicker}
             </p>
-            <h2 className="font-serif text-4xl font-medium leading-tight tracking-wide text-foreground text-balance md:text-5xl">
-              {s.title}
+
+            <h2
+              className="
+                font-serif
+                text-4xl
+                font-medium
+                leading-tight
+                tracking-wide
+                text-foreground
+                text-balance
+                md:text-5xl
+              "
+            >
+              {section.title}
             </h2>
-            <p className="mt-6 font-sans text-base leading-relaxed text-muted-foreground text-pretty">
-              {s.body}
+
+            <p
+              className="
+                mt-6
+                font-sans
+                text-base
+                leading-relaxed
+                text-muted-foreground
+                text-pretty
+              "
+            >
+              {section.body}
             </p>
           </div>
         </section>
       ))}
 
-      {/* Closing / CTA */}
-      <section className="relative flex h-screen flex-col items-center justify-center px-6 text-center">
+      {/* ========================================================
+          FINAL INTRO SECTION
+          ======================================================== */}
+
+      <section
+        className="
+          relative
+          flex
+          h-screen
+          flex-col
+          items-center
+          justify-center
+          px-6
+          text-center
+        "
+      >
         <p
           data-reveal
-          className="mb-4 font-sans text-xs uppercase tracking-[0.4em] text-primary"
+          className="
+            mb-6
+            font-sans
+            text-[10px]
+            uppercase
+            tracking-[0.55em]
+            text-primary
+            sm:text-xs
+          "
         >
-          One blade. One owner.
+          KATANA // AI SECURITY CORE
         </p>
+
         <h2
           data-reveal
-          className="font-serif text-5xl font-semibold tracking-[0.12em] text-foreground text-balance md:text-6xl"
+          className="
+            max-w-6xl
+            font-serif
+            text-5xl
+            font-semibold
+            tracking-[0.1em]
+            text-foreground
+            text-balance
+            sm:text-6xl
+            md:text-7xl
+            lg:text-8xl
+          "
         >
-          Claim the Steel
+          INTELLIGENCE BEHIND THE BLADE.
         </h2>
-        <button
+
+        <p
           data-reveal
-          type="button"
-          className="mt-10 rounded-none border border-primary bg-transparent px-10 py-4 font-sans text-xs uppercase tracking-[0.35em] text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+          className="
+            mt-8
+            max-w-2xl
+            font-sans
+            text-sm
+            leading-relaxed
+            text-muted-foreground
+            text-pretty
+          "
         >
-          Reserve a Commission
-        </button>
+          Continuous monitoring. Behavioral anomaly detection. Threat
+          analysis. Explainable AI. Human-controlled investigation.
+        </p>
+
+        <div
+          data-reveal
+          className="
+            absolute
+            bottom-10
+            flex
+            flex-col
+            items-center
+            gap-2
+            text-muted-foreground
+          "
+        >
+          <span
+            className="
+              font-sans
+              text-[0.65rem]
+              uppercase
+              tracking-[0.3em]
+            "
+          >
+            System Interface Ahead
+          </span>
+
+          <span
+            className="
+              h-10
+              w-px
+              animate-pulse
+              bg-gradient-to-b
+              from-primary
+              to-transparent
+            "
+          />
+        </div>
       </section>
+      <KatanaDashboard />
     </>
   )
 }

@@ -3,12 +3,13 @@ import asyncio
 from loguru import logger
 
 from app.event_store.store import event_store
+from app.explainability.engine import ExplainabilityEngine
 from app.feature_engine import feature_extractor
 from app.llm.ollama import OllamaClient
 from app.ml import anomaly_engine
 from app.recommendations import recommendation_engine
+from app.state.dashboard import dashboard_state
 from app.threat_engine.engine import ThreatEngine
-from app.explainability.engine import ExplainabilityEngine
 
 
 class PipelineOrchestrator:
@@ -81,6 +82,15 @@ class PipelineOrchestrator:
 
         if result["status"] == "learning":
 
+            # ------------------------------------------------------
+            # Update live dashboard state
+            # ------------------------------------------------------
+
+            dashboard_state.update_learning(
+                progress=result["progress"],
+                required=result["required"],
+            )
+
             logger.info(
                 f"Learning baseline "
                 f"({result['progress']}/{result['required']})"
@@ -97,6 +107,19 @@ class PipelineOrchestrator:
         # ==========================================================
 
         if not result["anomaly"]:
+
+            # ------------------------------------------------------
+            # Update live dashboard state
+            # ------------------------------------------------------
+
+            dashboard_state.update_normal(
+                score=float(
+                    result["score"]
+                ),
+                threshold=float(
+                    result["threshold"]
+                ),
+            )
 
             logger.info(
                 "System behavior normal."
@@ -138,7 +161,7 @@ class PipelineOrchestrator:
 
         # ==========================================================
         # PHASE 4 — THREAT ANALYSIS
-        # ==============================================================
+        # ==========================================================
 
         incident = self.threat_engine.analyze(
             features=features,
@@ -332,6 +355,7 @@ class PipelineOrchestrator:
 
         output = {
             "status": "anomaly",
+
             "anomaly": True,
 
             "score": float(
@@ -360,9 +384,17 @@ class PipelineOrchestrator:
 
             "investigation_commands": [
                 {
-                    "category": recommendation["category"],
-                    "reason": recommendation["reason"],
-                    "command": recommendation["command"],
+                    "category": (
+                        recommendation["category"]
+                    ),
+
+                    "reason": (
+                        recommendation["reason"]
+                    ),
+
+                    "command": (
+                        recommendation["command"]
+                    ),
                 }
                 for recommendation in recommendations
             ],
@@ -379,6 +411,14 @@ class PipelineOrchestrator:
 
             "automatic_remediation": False,
         }
+
+        # ==========================================================
+        # UPDATE LIVE DASHBOARD STATE
+        # ==========================================================
+
+        dashboard_state.update_incident(
+            output
+        )
 
         # ==========================================================
         # FINAL LOGGING
@@ -401,6 +441,14 @@ class PipelineOrchestrator:
     async def run(self):
 
         self.running = True
+
+        # ----------------------------------------------------------
+        # Update dashboard state
+        # ----------------------------------------------------------
+
+        dashboard_state.set_pipeline_running(
+            True
+        )
 
         logger.info(
             f"KATANA pipeline started "
@@ -430,6 +478,14 @@ class PipelineOrchestrator:
     async def stop(self):
 
         self.running = False
+
+        # ----------------------------------------------------------
+        # Update dashboard state
+        # ----------------------------------------------------------
+
+        dashboard_state.set_pipeline_running(
+            False
+        )
 
         logger.info(
             "KATANA pipeline stopped."
